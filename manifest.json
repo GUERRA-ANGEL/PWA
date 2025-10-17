@@ -1,0 +1,56 @@
+{
+  "name": "Datos Curiosos",
+  "short_name": "DatosCuriosos",
+  "description": "Descubre datos curiosos e interesantes todos los días",
+  "start_url": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay"],
+  "background_color": "#f5f7fa",
+  "theme_color": "#4a6fa5",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "widgets": [
+    {
+      "name": "Dato Curioso del Día",
+      "description": "Widget que muestra un dato curioso diario con opciones para guardar y actualizar",
+      "tag": "daily-fact",
+      "template": "daily-fact-template",
+      "ms_ac_template": "widgets/daily-fact-template.json",
+      "data": "widgets/daily-fact-data.json",
+      "type": "application/json",
+      "auth": false,
+      "update": 86400,
+      "multiple": false,
+      "icons": [
+        {
+          "src": "foco.png",
+          "sizes": "192x192"
+        }
+      ],
+      "screenshots": [
+        {
+          "src": "foco.png",
+          "sizes": "192x192",
+          "label": "Widget Dato Curioso del Día"
+        }
+      ]
+    }
+  ],
+  "categories": ["education", "entertainment"]
+  ,
+  "side_panel": {
+    "default_path": "/index.html",
+    "icon": "icon-192.svg"
+  }
+}

@@ -1,0 +1,1007 @@
+body {
+  margin: 0;
+  font-family: 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  /* Fondo igual al de la UI para que no se vean 'bordes' laterales */
+  background: #ffffff;
+}
+
+/* Title bar overlay siguiendo el tutorial de Window Controls Overlay */
+#title-bar {
+  position: fixed;
+  left: env(titlebar-area-x, 0);
+  top: env(titlebar-area-y, 0);
+  height: env(titlebar-area-height, 50px);
+  width: env(titlebar-area-width, 100%);
+  padding-top: env(safe-area-inset-top);
+  display: flex;
+  align-items: center;
+  justify-content: center; /* centra inner */
+  z-index: 1000;
+  pointer-events: auto;
+  -webkit-user-select: none;
+  user-select: none;
+  background: #111; /* fondo negro */
+  -webkit-app-region: drag; /* permitir arrastre desde el title-bar en Chromium */
+}
+
+.titlebar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1200px; /* ancho máximo para pantallas grandes */
+  padding: 6px 12px; /* algo de espacio interior */
+}
+/* Asegurar que titlebar-inner ocupe el ancho completo en pantallas grandes */
+@media (min-width: 1200px) {
+  .titlebar-inner { max-width: none; padding: 6px 20px; }
+}
+.titlebar-left { padding-left: 12px; font-weight:700; color:#fff; display:flex; align-items:center; gap:12px }
+.titlebar-right { display: none }
+.titlebar-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-app-region: no-drag; /* permitir click en botones */
+}
+.titlebar-btn:hover { background: rgba(255,255,255,0.06); }
+
+/* Navegación textual dentro de la title bar */
+.titlebar-nav { display:flex; gap:16px; align-items:center; justify-content:flex-start; flex:1 }
+.titlebar-tab { color: #fff; text-decoration: none; font-weight:700; padding:8px 10px; -webkit-app-region: no-drag; border-radius:6px }
+.titlebar-tab:hover { background: rgba(255,255,255,0.06); color: #fff }
+.titlebar-tab.active { background: rgba(255,255,255,0.12); color: #fff }
+
+/* Top nav (copied from bottom) shown inside title bar */
+.titlebar-top-nav { display:flex; gap:12px; align-items:center; margin-left:12px }
+.titlebar-top-nav .nav-tab { display:flex; flex-direction:column; align-items:center; justify-content:center; text-decoration:none; color: #fff; padding:6px 8px }
+.titlebar-top-nav .nav-icon { font-size:14px; margin-bottom:2px }
+.titlebar-top-nav .nav-label { font-size:11px }
+.titlebar-top-nav .nav-tab.active { color: #fff }
+
+/* Cuando se use Window Controls Overlay, desplazar el contenido principal hacia abajo */
+body.wco #app { margin-top: calc(env(titlebar-area-height, 50px) + env(safe-area-inset-top)); }
+
+/* Cuando estamos usando Window Controls Overlay o la app está en modo standalone
+  queremos que la title bar actúe como la barra principal: mostrar los botones
+  de la derecha y ocultar la top-nav textual que se usa en la web. */
+body.using-wco .titlebar-right { display: flex; gap: 8px; align-items: center }
+body.using-wco .titlebar-btn { display: inline-flex }
+body.using-wco .top-nav { display: none !important }
+/* Asegurar que el contenido tenga un margen superior suficiente */
+body.using-wco #app { margin-top: calc(env(titlebar-area-height, 50px) + env(safe-area-inset-top)); }
+
+/* En móvil ocultar la title bar */
+@media (max-width: 600px) {
+  #title-bar { display: none }
+}
+
+/* Development helper: permitir forzar la title bar aunque la PWA no esté instalada.
+   Útil para depuración local. Usa `document.body.classList.add('force-wco')` en consola. */
+body.force-wco #title-bar { display: flex !important }
+body.force-wco #app { margin-top: calc(env(titlebar-area-height, 50px) + env(safe-area-inset-top)) }
+
+/* Import Roboto locally via fallback - if you host, you can add a link to Google Fonts */
+@font-face {
+  font-family: 'Roboto';
+  src: local('Roboto'), local('Roboto-Regular');
+  font-weight: 400;
+}
+
+.top-nav {
+  position: sticky;
+  top: 0;
+  z-index: 900;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 10px 18px;
+  background: #111; /* negro */
+  color: #fff;
+}
+
+#app {
+  width: 100vw;
+  min-height: 100vh;
+  background: #ffffff;
+  margin: 0;
+  box-shadow: none; /* eliminar sombra exterior */
+}
+.top-nav .nav-tab {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+.top-nav .nav-tab:hover { background: rgba(255,255,255,0.06); }
+.top-nav .nav-tab.active { background: rgba(255,255,255,0.12); }
+
+/* En la top-nav sólo mostramos texto: ocultar iconos si accidentalmente existen dentro */
+.top-nav .nav-icon { display: none !important; }
+
+/* Ajustar margen del app cuando existe top-nav (espacio para sticky) */
+body.has-top-nav #app { margin-top: 0; }
+.container {
+  padding: 18px 20px;
+  max-width: none; /* permitir que el contenido ocupe todo el ancho */
+  margin: 0;
+}
+.header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding-bottom:8px;
+}
+.header-title { font-weight:700; font-size:18px; color:#111; }
+.header-actions .header-btn { background:none;border:1px solid #eef2f6;padding:8px;border-radius:10px; margin-left:8px }
+.search-bar { width:100%; padding:12px 14px; border-radius:10px; border:1px solid #e6eef6; background:#fbfdff }
+.category-filter { display:flex; gap:8px; margin:10px 0 }
+.category-filter-btn { background:#f1f5f9; border-radius:20px; padding:6px 12px; border:none; font-weight:600 }
+.category-filter-btn.active { background:#000; color:#fff }
+.saved-info { color:#888; font-size:13px; margin-top:8px }
+.card .actions { margin-top:14px }
+.favorite-label { display:inline-block; background:#eef6fb; color:#1976d2; padding:4px 8px; border-radius:10px; font-size:12px }
+.tag { background:#eef6fb; color:#1976d2; padding:6px 10px; border-radius:16px }
+.fact-item .card { margin-bottom:12px }
+.section {
+  display: none;
+  padding: 24px 16px 80px 16px;
+}
+.section.active {
+  display: block;
+}
+
+/* Forzar que solo la página activa sea visible (evita overlays de tarjetas grandes) */
+.page {
+  position: relative;
+  z-index: 0;
+}
+.page:not(.active) {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+.page.active {
+  display: block !important;
+  visibility: visible !important;
+  height: auto !important;
+  overflow: visible !important;
+  z-index: 2;
+}
+
+/* Asegurar que settings esté por encima en caso de solapamiento */
+.settings-wrapper { position: relative; z-index: 3 }
+
+/* Limitar altura de la tarjeta principal para no cubrir la pantalla completa */
+#current-fact { max-height: 640px; overflow: auto }
+
+/* Si estamos en la página settings, ocultar la tarjeta principal y el home para evitar overlays */
+body[data-page='settings'] #home { display: none !important; visibility: hidden !important }
+body[data-page='settings'] #current-fact { display: none !important; visibility: hidden !important }
+body[data-page='settings'] #settings { display: block !important; visibility: visible !important }
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 12px 0;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.04);
+  width: 100%;
+  animation: fadeIn 0.28s ease;
+}
+
+/* Estilos específicos para la pantalla de configuración */
+.settings-wrapper {
+  display:flex; flex-direction:column; gap:18px; align-items:stretch; width:100%; margin: 0;
+}
+.settings-card { padding: 0; background: transparent; box-shadow: none; border: none }
+.settings-card .setting-item { display:flex; gap:12px; align-items:center; justify-content:space-between; padding:0; background:transparent; border: none }
+.setting-left { display:flex; gap:12px; align-items:center; }
+.setting-row { background:#fff; border-radius:10px; padding:14px 12px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 2px 8px rgba(16,24,40,0.04); border:1px solid rgba(16,24,40,0.04); }
+.setting-row + .setting-row { margin-top:10px }
+.setting-icon { width:42px; height:42px; border-radius:50%; background:#f6f8fa; display:flex; align-items:center; justify-content:center; color:#6b7280; font-size:15px; border:1px solid rgba(16,24,40,0.03) }
+.setting-text { display:flex; flex-direction:column }
+.setting-label { font-weight:600; color:#111 }
+.setting-sub { font-size:13px; color:#777; margin-top:4px }
+.setting-right { color:#b0b7bf; min-width:44px; display:flex; align-items:center; justify-content:center }
+
+/* Ajuste del título de grupo (h2) para que sea más sutil */
+h2 { font-size:12px; color:#9aa1a9; margin: 20px 0 10px 0; font-weight:700; text-transform:uppercase; letter-spacing:0.6px }
+
+/* Estilo del toggle para que coincida con la imagen (switch limpio) */
+.toggle { position: relative; display: inline-block; width: 52px; height: 30px; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ffffff; border:1px solid #e6e6e6; transition: .2s; border-radius: 30px; }
+.toggle .slider:before { position: absolute; content: ""; height: 24px; width: 24px; left: 3px; bottom: 3px; background-color: white; transition: .2s; border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+.toggle input:checked + .slider { background-color: #111; border-color: rgba(255,255,255,0.1); }
+.toggle input:checked + .slider:before { transform: translateX(22px); background-color: #fff }
+
+/* Reducir padding de .container dentro de settings para efecto de tarjetas separadas */
+/* Ajuste de container para settings: centrar y limitar ancho (modo bloque para evitar solapamientos) */
+#settings .container { padding-top: 8px; padding-bottom: 80px; display:block }
+.settings-wrapper { margin: 0 auto; width: 100%; max-width: 720px; padding: 0 12px }
+
+/* Estilos del topbar de configuración */
+.settings-topbar { display:flex; align-items:center; justify-content:space-between; padding: 8px 0 14px 0; }
+.back-btn { background:none; border:none; font-size:18px; padding:6px 8px; color:#333; border-radius:8px }
+.settings-title { font-weight:700; text-align:center; flex:1; font-size:16px; color:#222 }
+.settings-spacer { width:36px }
+
+/* Estética de las tarjetas blancas con borde sutil como en la imagen */
+.settings-card { padding: 0 }
+.settings-card .setting-item { padding: 0 }
+.settings-card .setting-item .setting-icon { background: #fbfdff; color:#6b7280 }
+
+/* Modal reutilizable */
+.modal { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; z-index: 9999 }
+.modal[aria-hidden="false"] { display: flex }
+.modal-backdrop { position:absolute; inset:0; background: rgba(0,0,0,0.35) }
+.modal-panel { position:relative; background: #fff; width: 560px; max-width: 96%; border-radius: 12px; box-shadow: 0 12px 40px rgba(2,6,23,0.2); z-index: 2; overflow: hidden }
+.modal-header { display:flex; align-items:center; justify-content:space-between; padding:16px 18px; border-bottom:1px solid #f0f2f5 }
+.modal-body { padding:16px 18px; max-height:60vh; overflow:auto }
+.modal-footer { padding:12px 18px; border-top:1px solid #f0f2f5; display:flex; justify-content:flex-end }
+.modal-close { background:none; border:none; font-size:18px; padding:6px 8px }
+.modal .btn { background:#1976d2; color:white; border:none; padding:10px 16px; border-radius:8px }
+
+/* Ajustes para filas clicables */
+.setting-row { cursor: pointer }
+.setting-row .toggle { cursor: auto }
+
+/* Ajustes de tamaños para que el layout se parezca al screenshot */
+.setting-label { font-size: 15px }
+.setting-sub { font-size: 13px }
+
+/* Hover para filas clicables */
+.settings-card .setting-item:hover { background: rgba(16,24,40,0.02); }
+.settings-card .setting-item { cursor: pointer }
+.setting-right { display:flex; align-items:center; justify-content:center; min-width:44px }
+.setting-right i { color:#c3c8cc }
+.card .date {
+  color: #888;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+.card .fact-content {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #111;
+}
+.card .desc {
+  font-size: 15px;
+  color: #666;
+  margin-bottom: 16px;
+}
+.card button {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+/* Estilo específico para la tarjeta principal en Home: botón outline y botón negro */
+#home .card .actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.favorite-btn {
+  background: transparent;
+  border: 1px solid #e6e6e6;
+  color: #333;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.favorite-btn.active {
+  background: linear-gradient(90deg,#ff6b6b,#ff8e53);
+  color: #fff;
+  border: none;
+}
+
+#home .card #refresh-btn {
+  background: #000;
+  color: #fff;
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-weight: 800;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  letter-spacing: 0.2px;
+}
+.icon-circle {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 10px auto;
+  border-radius: 50%;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.icon-circle i {
+  color: #6b7280;
+  font-size: 20px;
+}
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 18px 0 10px 0;
+}
+.stats div {
+  background: #fff;
+  border: 1px solid #eef2f6;
+  border-radius: 10px;
+  padding: 12px 18px;
+  min-width: 110px;
+  text-align: center;
+  font-size: 14px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.03);
+}
+.stats .stat-number {
+  font-size: 20px;
+  font-weight: 700;
+  color: #222;
+}
+.stats .stat-label {
+  font-size: 12px;
+  color: #777;
+}
+.recent {
+  margin-top: 18px;
+}
+.recent h3 {
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: #1976d2;
+}
+.recent ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.recent li {
+  background: #fff;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  font-size: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+  border: 1px solid #f4f6f8;
+}
+.recent .item-left {
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+.recent .small-icon {
+  width:32px;height:32px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;color:#6b7280;font-size:14px;
+}
+.recent li span {
+  color: #888;
+  font-size: 13px;
+}
+.history-list, .fav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.history-list li, .fav-list li {
+  background: #f8f9fb;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 12px;
+  font-size: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.history-list .date, .fav-list .cat {
+  color: #1976d2;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+.history-list .fact, .fav-list .fact {
+  font-size: 16px;
+  font-weight: 500;
+  color: #222;
+}
+.history-list .desc, .fav-list .desc {
+  color: #555;
+  font-size: 14px;
+}
+.fav-list .saved {
+  color: #888;
+  font-size: 12px;
+  margin-top: 4px;
+}
+.tags, .categories {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0;
+  flex-wrap: wrap;
+}
+.tag {
+  background: #eef6fb;
+  border-radius: 18px;
+  padding: 6px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #1976d2;
+  font-weight: 600;
+}
+.tag.active {
+  background: #1976d2;
+  color: #fff;
+}
+.settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 10px;
+}
+.setting {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.setting:hover {
+  background: #f0f0f0;
+}
+
+.setting > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.setting > div span:first-child {
+  font-weight: 500;
+}
+
+.setting > div span:last-child {
+  color: #666;
+  font-size: 13px;
+}
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 14px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+button {
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 0;
+  margin: 4px 0;
+  cursor: pointer;
+  font-size: 16px;
+  position: relative;
+}
+button:active {
+  background: #1565c0;
+}
+#install-container button {
+  background: #43a047;
+  color: #fff;
+  font-size: 17px;
+  margin-top: 8px;
+  box-shadow: 0 2px 8px rgba(67,160,71,0.15);
+}
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  background: #fff;
+  border-top: 1px solid rgba(0,0,0,0.06);
+  display: flex;
+  justify-content: space-around;
+  padding: 0;
+  z-index: 30;
+  height: 60px;
+  box-shadow: 0 -2px 18px rgba(0,0,0,0.06);
+}
+.bottom-nav { display: none }
+.bottom-nav a {
+  background: none;
+  border: none;
+  flex: 1;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 64px;
+  font-size: 13px;
+  color: #222;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.bottom-nav a::after {
+  content: '';
+  display: block;
+  height: 3px;
+  width: 36px;
+  border-radius: 6px;
+  margin-top: 6px;
+  opacity: 0;
+}
+/* Restaurar iconos en la bottom nav (icon + label) */
+.bottom-nav .nav-icon { display: block; margin-bottom: 4px; height: 20px; }
+.bottom-nav .nav-label { display:block; font-size:12px; font-weight:600; margin: 0; }
+
+.bottom-nav a { padding: 6px 8px; }
+.bottom-nav a.active { color: #1976d2; }
+.bottom-nav a::after { display: none; }
+.bottom-nav a.active::after { background: linear-gradient(90deg,#1976d2,#90caf9); opacity: 1; }
+.nav-icon {
+  display: block;
+  margin-bottom: 2px;
+  height: 24px;
+}
+.nav-label {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Footer floating profile circle (simulated in images) */
+.floating-avatar {
+  position: fixed;
+  right: 18px;
+  bottom: 78px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(90deg,#555,#222);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+/* Tema oscuro */
+body.dark {
+  background: #0f0f0f;
+  color: #e0e0e0;
+}
+
+body.dark #app {
+  background: #1a1a1a;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.1);
+}
+
+body.dark .card {
+  background: #2a2a2a;
+  color: #e0e0e0;
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+body.dark .stats div,
+body.dark .recent li,
+body.dark .history-list li,
+body.dark .fav-list li,
+body.dark .setting {
+  background: #2a2a2a;
+  color: #e0e0e0;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+body.dark .tag {
+  background: #3a3a3a;
+  color: #64b5f6;
+  border: 1px solid rgba(100,181,246,0.3);
+}
+
+body.dark .tag.active {
+  background: #1976d2;
+  color: #ffffff;
+  border: 1px solid #1976d2;
+}
+
+body.dark .bottom-nav {
+  background: #1a1a1a;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+body.dark .bottom-nav button {
+  color: #b0b0b0;
+}
+
+body.dark .bottom-nav button.active {
+  color: #64b5f6;
+}
+/* Estilos para estado offline */
+.offline .section {
+  opacity: 0.8;
+}
+
+.offline .bottom-nav {
+  position: relative;
+}
+
+.offline .bottom-nav::before {
+  content: 'Modo Sin Conexión';
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ff9800;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  animation: fadeInOut 2s ease-in-out infinite;
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* Mejoras de rendimiento */
+.section {
+  will-change: transform;
+  transform: translateZ(0);
+  transition: opacity 0.3s ease;
+}
+
+.bottom-nav button {
+  will-change: transform;
+  transition: transform 0.2s ease;
+}
+
+.bottom-nav button:active {
+  transform: scale(0.95);
+}
+
+/* Optimizaciones móviles */
+/* Animaciones y transiciones */
+.section {
+  transition: opacity 0.3s ease;
+}
+
+.section.fade-in {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Estado vacío en favoritos */
+.empty-state {
+  text-align: center;
+  padding: 32px 16px;
+  color: #666;
+}
+
+.empty-state svg {
+  opacity: 0.5;
+  margin-bottom: 16px;
+}
+
+.empty-state p {
+  margin: 8px 0 16px;
+  font-size: 15px;
+}
+
+.empty-state button {
+  background: #1976d2;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+/* Mejoras visuales */
+.fact {
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.fact:hover {
+  color: #1976d2;
+}
+
+.fav-actions button {
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.fav-actions button:hover {
+  opacity: 1;
+}
+
+/* Responsive: tablet y móvil (full-width layout) */
+@media (max-width: 1024px) {
+  .container { padding: 14px; }
+  .card { padding: 16px; }
+  .header-title { font-size: 16px }
+  .stats { flex-direction: column; gap: 10px }
+  .stats div { min-width: 100%; }
+  .top-nav { padding: 8px 12px; overflow-x: auto }
+}
+
+@media (max-width: 600px) {
+  body { background: #f7f8fa }
+  #app { border-radius: 0 }
+  .section { padding: 12px 8px 96px 8px }
+  .card { padding: 14px }
+  .stats { gap: 10px; flex-wrap: wrap }
+  .stats div { min-width: 120px; flex: 1 }
+  .top-nav { display: none }
+  .bottom-nav { display: flex }
+}
+
+@media (min-width: 1025px) {
+  /* escritorio: mostrar top-nav y layout central limitado por container max-width */
+  .top-nav { display: flex }
+  .bottom-nav { display: none }
+}
+
+/* Tema oscuro */
+body.dark .empty-state {
+  color: #999;
+}
+
+body.dark .fact:hover {
+  color: #64b5f6;
+}
+
+/* Configuración en tema oscuro */
+body.dark .settings-card {
+  background: #2a2a2a;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+body.dark .setting-row {
+  background: #2a2a2a;
+  color: #e0e0e0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+body.dark .setting-row:hover {
+  background: #3a3a3a;
+}
+
+body.dark .setting-label {
+  color: #e0e0e0;
+}
+
+body.dark .setting-sub {
+  color: #b0b0b0;
+}
+
+body.dark .setting-icon {
+  color: #64b5f6;
+}
+
+/* Header en tema oscuro */
+body.dark .header {
+  background: #1a1a1a;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+body.dark .header-title {
+  color: #e0e0e0;
+}
+
+body.dark .header-btn {
+  color: #b0b0b0;
+}
+
+body.dark .header-btn:hover {
+  color: #64b5f6;
+}
+
+/* Botones en tema oscuro */
+body.dark .btn {
+  background: #3a3a3a;
+  color: #e0e0e0;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+body.dark .btn:hover {
+  background: #4a4a4a;
+  border-color: #64b5f6;
+}
+
+body.dark .favorite-btn {
+  background: #3a3a3a;
+  color: #e0e0e0;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+body.dark .favorite-btn:hover {
+  background: #4a4a4a;
+  border-color: #64b5f6;
+}
+
+/* Modal en tema oscuro */
+body.dark .modal {
+  background: rgba(0,0,0,0.8);
+}
+
+body.dark .modal-panel {
+  background: #2a2a2a;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+body.dark .modal-header h3 {
+  color: #e0e0e0;
+}
+
+body.dark .modal-close {
+  color: #b0b0b0;
+}
+
+body.dark .modal-close:hover {
+  color: #e0e0e0;
+}
+
+/* Inputs en tema oscuro */
+body.dark input,
+body.dark select,
+body.dark textarea {
+  background: #3a3a3a;
+  color: #e0e0e0;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+body.dark input:focus,
+body.dark select:focus,
+body.dark textarea:focus {
+  border-color: #64b5f6;
+  box-shadow: 0 0 0 2px rgba(100,181,246,0.2);
+}
+
+/* Toggle Switch mejorado */
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #1976d2;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+/* Toggle en tema oscuro */
+body.dark .slider {
+  background-color: #555;
+}
+
+body.dark input:checked + .slider {
+  background-color: #64b5f6;
+}
+
+body.dark .slider:before {
+  background-color: #e0e0e0;
+}
+
+/* Switch legacy */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #1976d2;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+/* Toast */
+.app-toast {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  z-index: 1000;
+}

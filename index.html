@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datos Curiosos</title>
+    <meta name="theme-color" content="#4a6fa5">
+    <meta name="description" content="Descubre datos curiosos e interesantes todos los días">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="icon-192.svg">
+    <link rel="apple-touch-icon" href="icon-512.png">
+</head>
+<body>
+    <!-- Title bar overlay (fuera de #app) para Window Controls Overlay - oculto por defecto -->
+    <div id="title-bar" class="titlebar" aria-hidden="true" style="display:none">
+        <div class="titlebar-inner">
+            <div class="titlebar-left">Datos Curiosos</div>
+            <!-- Navegación textual dentro de la title bar (sólo palabras) -->
+                <nav class="titlebar-nav" aria-label="Navegación principal">
+                <a href="#" class="titlebar-tab" data-page="home">Inicio</a>
+                <a href="#" class="titlebar-tab" data-page="history">Historia</a>
+                <a href="#" class="titlebar-tab" data-page="favorites">Favoritas</a>
+                <a href="#" class="titlebar-tab" data-page="random">Aleatorio</a>
+                <a href="#" class="titlebar-tab" data-page="settings">Ajustes</a>
+                </nav>
+                <!-- Top copy of bottom nav (icons + labels) -->
+                <div class="titlebar-top-nav" aria-hidden="false">
+                    <a href="#" class="nav-tab active" data-page="home">
+                        <span class="nav-icon"><i class="fas fa-home"></i></span>
+                        <span class="nav-label">Inicio</span>
+                    </a>
+                    <a href="#" class="nav-tab" data-page="history">
+                        <span class="nav-icon"><i class="fas fa-history"></i></span>
+                        <span class="nav-label">Historial</span>
+                    </a>
+                    <a href="#" class="nav-tab" data-page="favorites">
+                        <span class="nav-icon"><i class="fas fa-bookmark"></i></span>
+                        <span class="nav-label">Favoritas</span>
+                    </a>
+                    <a href="#" class="nav-tab" data-page="random">
+                        <span class="nav-icon"><i class="fas fa-random"></i></span>
+                        <span class="nav-label">Aleatorio</span>
+                    </a>
+                    <a href="#" class="nav-tab" data-page="settings">
+                        <span class="nav-icon"><i class="fas fa-cog"></i></span>
+                        <span class="nav-label">Ajustes</span>
+                    </a>
+                </div>
+            <div class="titlebar-right">
+                <button class="titlebar-btn" id="minimize-btn">Minimizar</button>
+                <button class="titlebar-btn" id="maximize-btn">Maximizar</button>
+                <button class="titlebar-btn" id="close-btn">Cerrar</button>
+                <button class="titlebar-btn" id="restore-btn" style="display:none">Restaurar</button>
+            </div>
+        </div>
+    </div>
+    <div id="app">
+        <!-- Top navigation similar to VS Code: solo palabras, encima del contenido -->
+        <div class="top-nav nav-tabs" role="navigation" aria-label="Navegación superior">
+            <a href="#" class="nav-tab active" data-page="home">Inicio</a>
+            <a href="#" class="nav-tab" data-page="history">Historial</a>
+            <a href="#" class="nav-tab" data-page="favorites">Favoritas</a>
+            <a href="#" class="nav-tab" data-page="random">Aleatorio</a>
+            <a href="#" class="nav-tab" data-page="settings">Ajustes</a>
+        </div>
+        <!-- Página Principal -->
+        <div id="home" class="page active section">
+            <div class="container">
+                <div class="header">
+                    <div class="header-title">Hoy</div>
+                    <div class="header-actions">
+                        <button class="header-btn" id="search-btn" title="Buscar"><i class="fas fa-search"></i></button>
+                        <button class="header-btn" id="settings-btn" title="Ajustes"><i class="fas fa-cog"></i></button>
+                        <!-- Botón de instalación PWA (se muestra si antesinstallprompt disponible) -->
+                        <button class="header-btn" id="install-btn" style="display:none" title="Instalar"><i class="fas fa-download"></i></button>
+                    </div>
+                </div>
+                
+                <div id="current-fact" class="card">
+                    <!-- El contenido se carga dinámicamente -->
+                    <!-- Estructura base para que UI pueda rellenar, incluye icono central -->
+                    <div class="icon-circle"><i class="fas fa-lightbulb"></i></div>
+                    <div class="date">&nbsp;</div>
+                    <div class="fact-content">&nbsp;</div>
+                    <div class="desc">&nbsp;</div>
+                    <div class="actions">
+                        <button class="favorite-btn" id="home-fav-placeholder" title="Guardar en Favoritos"><i class="far fa-bookmark"></i> Guardar en Favoritos</button>
+                        <button class="" id="refresh-btn" title="Refrescar datos"><i class="fas fa-sync-alt"></i> Refrescar</button>
+                    </div>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-number" id="viewed-count">247</div>
+                        <div class="stat-label">Datos vistas</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="favorites-count">18</div>
+                        <div class="stat-label">Favoritas</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="shared-count">5</div>
+                        <div class="stat-label">Compartidas</div>
+                    </div>
+                </div>
+                
+                <h2>Datos recientes</h2>
+                <div id="recent-facts" class="recent">
+                    <!-- Los datos recientes se cargan dinámicamente -->
+                    <ul>
+                        <!-- Ejemplo de item -->
+                        <li>
+                            <div class="item-left"><div class="small-icon"><i class="fas fa-star"></i></div><div>
+                                <div class="fact-title">&nbsp;</div>
+                                <div class="fact-date">&nbsp;</div>
+                            </div></div>
+                            <div class="actions"><button class="favorite-btn" data-id="0" title="Guardar en Favoritos"><i class="far fa-bookmark"></i></button></div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Historial -->
+        <div id="history" class="page section">
+            <div class="container">
+                <h1>Historial</h1>
+                
+                <input type="text" class="search-bar" id="history-search" placeholder="Buscar por palabra clave o fecha...">
+                
+                <div id="history-list">
+                    <!-- El historial se carga dinámicamente -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Favoritos -->
+        <div id="favorites" class="page section">
+            <div class="container">
+                <h1>Mis Favoritos</h1>
+                
+                <input type="text" class="search-bar" id="favorites-search" placeholder="Buscar en favoritos...">
+                
+                <div class="category-filter">
+                    <button class="category-filter-btn active" data-category="all">Todos</button>
+                    <button class="category-filter-btn" data-category="ciencias">Ciencias</button>
+                    <button class="category-filter-btn" data-category="historia">Historia</button>
+                    <button class="category-filter-btn" data-category="naturaleza">Naturaleza</button>
+                </div>
+                
+                <div class="saved-info" id="favorites-count-text">24 datos curiosos guardados</div>
+                
+                <div id="favorites-list">
+                    <!-- Los favoritos se cargan dinámicamente -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Aleatorio -->
+        <div id="random" class="page section">
+            <div class="container">
+                <h1>Aleatorio</h1>
+                
+                <div class="random-fact card">
+                    <h2>Dato Curioso</h2>
+                    <div class="fact-content" id="random-fact-text"></div>
+                    <div class="date" id="random-fact-date"></div>
+                    
+                    <div class="random-actions">
+                        <button class="random-btn" id="random-favorite-btn" title="Guardar en Favoritos"><i class="far fa-bookmark"></i> Favoritos</button>
+                        <button class="random-btn" id="random-share-btn" title="Compartir dato curioso"><i class="fas fa-share-alt"></i> Compartir</button>
+                    </div>
+                </div>
+                
+                <button class="random-btn" id="new-random-btn" style="width: 100%; justify-content: center; margin-top: 20px;" title="Ver otro dato curioso">
+                    <i class="fas fa-sync-alt"></i> Ver otro dato curioso
+                </button>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-number" id="random-viewed-count">47</div>
+                        <div class="stat-label">Datos vistas</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="random-favorites-count">12</div>
+                        <div class="stat-label">Favoritas</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="random-shared-count">8</div>
+                        <div class="stat-label">Compartidas</div>
+                    </div>
+                </div>
+                
+                <h2>Categorías populares</h2>
+                <div class="categories">
+                    <div class="category-tag">Ciencia</div>
+                    <div class="category-tag">Historia</div>
+                    <div class="category-tag">Naturaleza</div>
+                    <div class="category-tag">Tecnología</div>
+                    <div class="category-tag">Espacio</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Configuración -->
+        <div id="settings" class="page section">
+            <div class="container">
+                <div class="settings-topbar">
+                    <button id="settings-back" class="back-btn" aria-label="Volver"><i class="fas fa-arrow-left"></i></button>
+                    <div class="settings-title">Configuración</div>
+                    <div class="settings-spacer"></div>
+                </div>
+                
+                <div class="settings-wrapper">
+                <h2>IDIOMA</h2>
+                <div class="settings-card">
+                    <div class="setting-row" data-action="language">
+                        <div class="setting-left">
+                            <div class="setting-icon"><i class="fas fa-globe"></i></div>
+                            <div class="setting-text">
+                                <span class="setting-label">Idioma de la aplicación</span>
+                                <span class="setting-sub">Español</span>
+                            </div>
+                        </div>
+                        <div class="setting-right"><i class="fas fa-chevron-right"></i></div>
+                    </div>
+                </div>
+                
+                <h2>NOTIFICACIONES</h2>
+                <div class="settings-card">
+                    <div class="setting-row" data-action="notifications">
+                        <div class="setting-left">
+                            <div class="setting-icon"><i class="fas fa-bell"></i></div>
+                            <div class="setting-text">
+                                <span class="setting-label">Notificaciones diarias</span>
+                                <span class="setting-sub">Recibe datos curiosos</span>
+                            </div>
+                        </div>
+                        <div class="setting-right">
+                            <label class="toggle">
+                                <input type="checkbox" id="notifications-toggle" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="setting-row" data-action="notificationTime">
+                        <div class="setting-left">
+                            <div class="setting-icon"><i class="fas fa-clock"></i></div>
+                            <div class="setting-text">
+                                <span class="setting-label">Hora de notificación</span>
+                                <span class="setting-sub">08:00 AM</span>
+                            </div>
+                        </div>
+                        <div class="setting-right"><i class="fas fa-chevron-right"></i></div>
+                    </div>
+                </div>
+                
+                <h2>INFORMACIÓN</h2>
+                <div class="settings-card">
+                    <div class="setting-row" data-action="about">
+                        <div class="setting-left">
+                            <div class="setting-icon"><i class="fas fa-info-circle"></i></div>
+                            <div class="setting-text">
+                                <span class="setting-label">Acerca de</span>
+                                <span class="setting-sub">Versión 1.0.0</span>
+                            </div>
+                        </div>
+                        <div class="setting-right"><i class="fas fa-chevron-right"></i></div>
+                    </div>
+                    <div class="setting-row" data-action="privacy">
+                        <div class="setting-left">
+                            <div class="setting-icon"><i class="fas fa-shield-alt"></i></div>
+                            <div class="setting-text">
+                                <span class="setting-label">Política de privacidad</span>
+                                <span class="setting-sub">Ver términos</span>
+                            </div>
+                        </div>
+                        <div class="setting-right"><i class="fas fa-chevron-right"></i></div>
+                    </div>
+                    <div class="setting-row" data-action="rate">
+                        <div class="setting-left">
+                            <div class="setting-icon"><i class="fas fa-star"></i></div>
+                            <div class="setting-text">
+                                <span class="setting-label">Calificar aplicación</span>
+                                <span class="setting-sub">Ayúdanos a mejorar</span>
+                            </div>
+                        </div>
+                        <div class="setting-right"><i class="fas fa-chevron-right"></i></div>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Navegación -->
+    <div class="bottom-nav nav-tabs">
+        <a href="#" class="nav-tab active" data-page="home">
+            <span class="nav-icon"><i class="fas fa-home"></i></span>
+            <span class="nav-label">Inicio</span>
+        </a>
+        <a href="#" class="nav-tab" data-page="history">
+            <span class="nav-icon"><i class="fas fa-history"></i></span>
+            <span class="nav-label">Historial</span>
+        </a>
+        <a href="#" class="nav-tab" data-page="favorites">
+            <span class="nav-icon"><i class="fas fa-bookmark"></i></span>
+            <span class="nav-label">Favoritas</span>
+        </a>
+        <a href="#" class="nav-tab" data-page="random">
+            <span class="nav-icon"><i class="fas fa-random"></i></span>
+            <span class="nav-label">Aleatorio</span>
+        </a>
+        <a href="#" class="nav-tab" data-page="settings">
+            <span class="nav-icon"><i class="fas fa-cog"></i></span>
+            <span class="nav-label">Ajustes</span>
+        </a>
+    </div>
+
+    <!-- Toast para mensajes -->
+    <div id="toast"></div>
+
+    <!-- Avatar flotante (eliminado) -->
+
+    <!-- Modal reutilizable para ajustes -->
+    <div id="settings-modal" class="modal" aria-hidden="true">
+        <div class="modal-backdrop"></div>
+        <div class="modal-panel">
+            <div class="modal-header">
+                <h3 id="modal-title">Título</h3>
+                <button id="modal-close" class="modal-close" aria-label="Cerrar">✕</button>
+            </div>
+            <div id="modal-body" class="modal-body">
+                <!-- contenido dinámico -->
+            </div>
+            <div class="modal-footer">
+                <button id="modal-save" class="btn" title="Guardar configuración">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="store.js"></script>
+    <script src="utils.js"></script>
+    <script src="ui.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+         xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+         xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3"
+         xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10">
+  <Identity Name="DatosCuriosos"
+            Publisher="CN=Developer"
+            Version="1.0.0.0" />
+  
+  <Properties>
+    <DisplayName>Datos Curiosos PWA</DisplayName>
+    <PublisherDisplayName>Developer</PublisherDisplayName>
+    <Description>PWA con widget de datos curiosos diarios</Description>
+    <Logo>StoreLogo.png</Logo>
+  </Properties>
+  
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.17763.0" MaxVersionTested="10.0.22000.0" />
+  </Dependencies>
+  
+  <Resources>
+    <Resource Language="x-generate"/>
+  </Resources>
+  
+  <Applications>
+    <Application Id="App"
+                 Executable="$targetnametoken$.exe"
+                 EntryPoint="$targetentrypoint$">
+      <uap:VisualElements
+          DisplayName="Datos Curiosos"
+          Square150x150Logo="Square150x150Logo.png"
+          Square44x44Logo="Square44x44Logo.png"
+          Description="Datos curiosos diarios con widget"
+          BackgroundColor="transparent">
+        <uap:DefaultTile Wide310x150Logo="Wide310x150Logo.png"/>
+        <uap:SplashScreen Image="SplashScreen.png" />
+      </uap:VisualElements>
+      
+      <!-- Declaración de widget -->
+      <uap3:Extension Category="windows.appExecutionAlias">
+        <uap3:AppExecutionAlias>
+          <desktop:ExecutionAlias Alias="datos-curiosos" />
+        </uap3:AppExecutionAlias>
+      </uap3:Extension>
+      
+      <!-- Protocolo para abrir la PWA -->
+      <uap:Extension Category="windows.protocol">
+        <uap:Protocol Name="datos-curiosos">
+          <uap:DisplayName>Datos Curiosos</uap:DisplayName>
+        </uap:Protocol>
+      </uap:Extension>
+    </Application>
+  </Applications>
+  
+  <!-- Capacidades necesarias para widgets -->
+  <Capabilities>
+    <Capability Name="internetClient" />
+    <uap:Capability Name="webApplication" />
+  </Capabilities>
+</Package>

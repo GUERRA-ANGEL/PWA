@@ -1,0 +1,67 @@
+{
+  "facts": [
+    {
+      "id": 1,
+      "title": "Los pulpos tienen tres corazones y sangre azul",
+      "content": "Los pulpos tienen tres corazones y sangre azul debido a una proteína rica en cobre llamada hemocianina. Dos corazones bombean sangre a las branquias, mientras que el tercero bombea sangre al resto del cuerpo.",
+      "category": "ciencias",
+      "date": "2025-09-25"
+    },
+    {
+      "id": 2,
+      "title": "Las abejas pueden reconocer rostros humanos",
+      "content": "Las abejas pueden reconocer rostros humanos usando la misma técnica que utilizan para identificar diferentes tipos de flores.",
+      "category": "naturaleza",
+      "date": "2025-09-25"
+    },
+    {
+      "id": 3,
+      "title": "Un día en Venus dura más que un año venusiano",
+      "content": "Un día en Venus (el tiempo que tarda en girar sobre su eje) dura 243 días terrestres, mientras que un año venusiano (el tiempo que tarda en orbitar el Sol) dura solo 225 días terrestres.",
+      "category": "espacio",
+      "date": "2025-09-24"
+    },
+    {
+      "id": 4,
+      "title": "El corazón humano late aproximadamente 3 mil millones de veces en una vida",
+      "content": "Esto equivale a aproximadamente 100,000 latidos por día y 35 millones por año.",
+      "category": "ciencias",
+      "date": "2025-09-23"
+    },
+    {
+      "id": 5,
+      "title": "Los delfines se llaman por nombres únicos",
+      "content": "Cada delfín desarrolla un silbido distintivo que funciona como su nombre personal.",
+      "category": "naturaleza",
+      "date": "2025-09-22"
+    },
+    {
+      "id": 6,
+      "title": "La Gran Muralla China no es visible desde el espacio a simple vista",
+      "content": "Contrario a la creencia popular, la Gran Muralla China no es visible desde el espacio a simple vista. Esta es una leyenda urbana que ha persistido durante décadas.",
+      "category": "historia",
+      "date": "2025-01-12"
+    },
+    {
+      "id": 7,
+      "title": "El corazón de un camarón está ubicado en su cabeza",
+      "content": "A diferencia de los humanos, el corazón de un camarón se encuentra en su cabeza.",
+      "category": "naturaleza",
+      "date": "2025-01-10"
+    },
+    {
+      "id": 8,
+      "title": "Los osos polares son casi invisibles bajo la cámara infrarroja",
+      "content": "Debido a su pelaje y grasa, los osos polares son casi invisibles bajo la cámara infrarroja.",
+      "category": "naturaleza",
+      "date": "2025-01-08"
+    }
+  ],
+  "categories": [
+    "ciencias",
+    "historia",
+    "naturaleza",
+    "tecnologia",
+    "espacio"
+  ]
+}
